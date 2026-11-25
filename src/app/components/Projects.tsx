@@ -531,9 +531,10 @@ function CaseStudyModal({
 
 export default function Projects() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [spotlightId, setSpotlightId] = useState(projects[0].id);
+  const [activeSpotlightIndex, setActiveSpotlightIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState<"next" | "prev">("next");
+  const [isPreviewHovered, setIsPreviewHovered] = useState(false);
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
-  const [featuredPage, setFeaturedPage] = useState(0);
   const lastFocusedRef = useRef<HTMLElement | null>(null);
 
   const categories = useMemo(
@@ -552,18 +553,57 @@ export default function Projects() {
     [activeCategory]
   );
 
-  const featuredPairs = useMemo(() => {
-    const pairs: (typeof projects)[] = [];
-    for (let i = 0; i < projects.length; i += 2) {
-      pairs.push(projects.slice(i, i + 2));
-    }
-    return pairs;
+  const nextFeaturedIndex = (activeSpotlightIndex + 1) % projects.length;
+  const currentPair = useMemo(
+    () => [
+      {
+        project: projects[activeSpotlightIndex],
+        projectIndex: activeSpotlightIndex,
+      },
+      {
+        project: projects[nextFeaturedIndex],
+        projectIndex: nextFeaturedIndex,
+      },
+    ],
+    [activeSpotlightIndex, nextFeaturedIndex]
+  );
+
+  const spotlightProject = projects[activeSpotlightIndex] ?? projects[0];
+  const spotlightPillars = getCaseStudyPillars(spotlightProject);
+
+  useEffect(() => {
+    if (activeModalId !== null || isPreviewHovered) return;
+
+    const timer = window.setInterval(() => {
+      if (document.hidden) return;
+      setSlideDirection("next");
+      setActiveSpotlightIndex((prev) => (prev + 1) % projects.length);
+    }, 5000);
+
+    return () => window.clearInterval(timer);
+  }, [activeModalId, activeSpotlightIndex, isPreviewHovered]);
+
+  const handlePrevProject = useCallback(() => {
+    setSlideDirection("prev");
+    setActiveSpotlightIndex(
+      (prev) => (prev - 1 + projects.length) % projects.length
+    );
   }, []);
 
-  const currentPair = featuredPairs[featuredPage] ?? featuredPairs[0];
-  const spotlightProject =
-    projects.find((p) => p.id === spotlightId) ?? projects[0];
-  const spotlightPillars = getCaseStudyPillars(spotlightProject);
+  const handleNextProject = useCallback(() => {
+    setSlideDirection("next");
+    setActiveSpotlightIndex((prev) => (prev + 1) % projects.length);
+  }, []);
+
+  const handleSelectProjectIndex = useCallback(
+    (index: number) => {
+      const normalized = (index + projects.length) % projects.length;
+      if (normalized === activeSpotlightIndex) return;
+      setSlideDirection(normalized > activeSpotlightIndex ? "next" : "prev");
+      setActiveSpotlightIndex(normalized);
+    },
+    [activeSpotlightIndex]
+  );
 
   const modalList = useMemo(() => {
     if (activeModalId && visibleProjects.some((p) => p.id === activeModalId)) {
@@ -609,7 +649,7 @@ export default function Projects() {
     <section className="section-light" id="projects">
       <div className="container">
         <div className="section-heading-row" data-reveal>
-          <div>
+          <div className="projects-heading-copy">
             <span className="eyebrow-orange">Proof of work</span>
             <h2 className="section-title-lg">
               Case studies with the problem, architecture, and{" "}
@@ -621,124 +661,183 @@ export default function Projects() {
               about my engineering judgment.
             </p>
           </div>
-
-          <button
-            type="button"
-            className="btn-orange-pill"
-            onClick={() => setActiveCategory("All")}
-          >
-            <span>All ({projects.length})</span>
-            <ArrowUpRightIcon />
-          </button>
-        </div>
-
-        {/* 2-Up Featured Spotlight Carousel (Figma Frame 76) */}
-        <div className="featured-pair-grid">
-          {currentPair.map((project, idx) => (
-            <article
-              key={project.id}
-              className={`featured-showcase-card theme-${(featuredPage * 2 + idx) % 3} ${
-                spotlightProject.id === project.id ? "is-selected" : ""
-              }`}
-              onClick={() => setSpotlightId(project.id)}
-            >
-              <div className="featured-top-row">
-                <div className="featured-badges">
-                  <span className="featured-cat-pill">{project.category}</span>
-                  <span className="featured-cat-pill">{project.status}</span>
-                </div>
-                <span className="featured-arrow-circle" aria-hidden="true">
-                  <ArrowUpRightIcon />
-                </span>
-              </div>
-
-              <div className="featured-bottom">
-                <h3>{project.title}</h3>
-                <p>{project.subtitle}</p>
-              </div>
-            </article>
-          ))}
         </div>
 
         <div
-          className="featured-dots-row"
-          role="tablist"
-          aria-label="Featured project pairs"
+          className="projects-spotlight-stage"
+          onKeyDown={(event) => {
+            if (event.key === "ArrowLeft") {
+              event.preventDefault();
+              handlePrevProject();
+            } else if (event.key === "ArrowRight") {
+              event.preventDefault();
+              handleNextProject();
+            }
+          }}
         >
-          {featuredPairs.map((_, idx) => (
+          {/* 2-Up Featured Spotlight Carousel (Figma Frame 76) */}
+          <div className="featured-carousel-shell">
             <button
-              key={idx}
               type="button"
-              role="tab"
-              aria-selected={featuredPage === idx}
-              aria-label={`Show featured projects page ${idx + 1}`}
-              className={`dot-btn ${featuredPage === idx ? "is-active" : ""}`}
-              onClick={() => {
-                setFeaturedPage(idx);
-                if (featuredPairs[idx]?.[0]) {
-                  setSpotlightId(featuredPairs[idx][0].id);
-                }
-              }}
-            />
-          ))}
-        </div>
+              className="featured-nav-btn is-prev"
+              aria-label="Previous project"
+              onClick={handlePrevProject}
+            >
+              <ChevronLeftIcon />
+            </button>
 
-        {/* Active Spotlight Summary Panel */}
-        <div className="spotlight-panel">
-          <div className="spotlight-header">
-            <h3>{spotlightProject.title}</h3>
-            {spotlightProject.links?.[0] ? (
-              <a
-                href={spotlightProject.links[0].href}
-                target="_blank"
-                rel="noreferrer"
-                className="spotlight-orange-btn"
-                aria-label={`Open ${spotlightProject.title}`}
-              >
-                <ArrowUpRightIcon />
-              </a>
-            ) : (
-              <button
-                type="button"
-                className="spotlight-orange-btn"
-                aria-haspopup="dialog"
-                aria-label={`Open ${spotlightProject.title} case study`}
-                onClick={() => openCaseStudy(spotlightProject.id)}
-              >
-                <ArrowUpRightIcon />
-              </button>
-            )}
-          </div>
+            <div className="featured-pair-grid">
+              {currentPair.map(({ project, projectIndex }, slotIdx) => {
+                const isSelected = slotIdx === 0;
+                return (
+                  <article
+                    key={`${project.id}-${slotIdx}`}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={isSelected}
+                    aria-label={
+                      isSelected
+                        ? `Open ${project.title} case study`
+                        : `Preview ${project.title} in overview`
+                    }
+                    className={`featured-showcase-card theme-${projectIndex % 3} ${
+                      isSelected ? "is-selected" : ""
+                    } slide-${slideDirection}`}
+                    onClick={() => {
+                      if (isSelected) {
+                        openCaseStudy(project.id);
+                      } else {
+                        handleNextProject();
+                      }
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        if (isSelected) {
+                          openCaseStudy(project.id);
+                        } else {
+                          handleNextProject();
+                        }
+                      }
+                    }}
+                  >
+                    <div className="featured-top-row">
+                      <div className="featured-badges">
+                        <span className="featured-cat-pill">
+                          {project.category}
+                        </span>
+                        <span className="featured-cat-pill">
+                          {project.status}
+                        </span>
+                      </div>
+                      <span className="featured-arrow-circle" aria-hidden="true">
+                        <ArrowUpRightIcon />
+                      </span>
+                    </div>
 
-          <p className="spotlight-subtitle">{spotlightProject.subtitle}</p>
-
-          <div className="spotlight-stack-row">
-            {spotlightProject.stack.map((tech) => (
-              <span className="spotlight-pill" key={tech}>
-                {tech}
-              </span>
-            ))}
-          </div>
-
-          <div className="spotlight-triad">
-            {spotlightPillars.map((pillar) => (
-              <div className="spotlight-triad-item" key={pillar.label}>
-                <span>{pillar.label}</span>
-                <p>{pillar.body}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="spotlight-footer-bar">
-            <div className="spotlight-evidence-row">
-              {spotlightProject.evidence.map((item) => (
-                <span className="spotlight-evidence-chip" key={item}>
-                  <CheckCircleIcon />
-                  <span>{item}</span>
-                </span>
-              ))}
+                    <div className="featured-bottom">
+                      <h3>{project.title}</h3>
+                      <p>{project.subtitle}</p>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-            <ProjectLinks links={spotlightProject.links} />
+
+            <button
+              type="button"
+              className="featured-nav-btn is-next"
+              aria-label="Next project"
+              onClick={handleNextProject}
+            >
+              <ChevronRightIcon />
+            </button>
+          </div>
+
+          <div
+            className="featured-dots-row"
+            role="tablist"
+            aria-label="Featured projects"
+          >
+            {projects.map((project, idx) => (
+              <button
+                key={project.id}
+                type="button"
+                role="tab"
+                aria-selected={activeSpotlightIndex === idx}
+                aria-label={`Show project ${idx + 1}: ${project.title}`}
+                className={`dot-btn ${
+                  activeSpotlightIndex === idx ? "is-active" : ""
+                }`}
+                onClick={() => handleSelectProjectIndex(idx)}
+              />
+            ))}
+          </div>
+
+          {/* Active Spotlight Summary Panel */}
+          <div
+            className="spotlight-panel"
+            aria-live="polite"
+            onMouseEnter={() => setIsPreviewHovered(true)}
+            onMouseLeave={() => setIsPreviewHovered(false)}
+          >
+            <div className="spotlight-content" key={spotlightProject.id}>
+              <div className="spotlight-header">
+                <h3>{spotlightProject.title}</h3>
+                {spotlightProject.links?.[0] ? (
+                  <a
+                    href={spotlightProject.links[0].href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="spotlight-orange-btn"
+                    aria-label={`Open ${spotlightProject.title}`}
+                  >
+                    <ArrowUpRightIcon />
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className="spotlight-orange-btn"
+                    aria-haspopup="dialog"
+                    aria-label={`Open ${spotlightProject.title} case study`}
+                    onClick={() => openCaseStudy(spotlightProject.id)}
+                  >
+                    <ArrowUpRightIcon />
+                  </button>
+                )}
+              </div>
+
+              <p className="spotlight-subtitle">{spotlightProject.subtitle}</p>
+
+              <div className="spotlight-stack-row">
+                {spotlightProject.stack.map((tech) => (
+                  <span className="spotlight-pill" key={tech}>
+                    {tech}
+                  </span>
+                ))}
+              </div>
+
+              <div className="spotlight-triad">
+                {spotlightPillars.map((pillar) => (
+                  <div className="spotlight-triad-item" key={pillar.label}>
+                    <span>{pillar.label}</span>
+                    <p>{pillar.body}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="spotlight-footer-bar">
+                <div className="spotlight-evidence-row">
+                  {spotlightProject.evidence.map((item) => (
+                    <span className="spotlight-evidence-chip" key={item}>
+                      <CheckCircleIcon />
+                      <span>{item}</span>
+                    </span>
+                  ))}
+                </div>
+                <ProjectLinks links={spotlightProject.links} />
+              </div>
+            </div>
           </div>
         </div>
 

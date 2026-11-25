@@ -7,7 +7,7 @@ import { profile } from "../data/portfolio";
 const leftNavItems = [
   { href: "#home", label: "Home" },
   { href: "#positioning", label: "Positioning" },
-  { href: "#capability", label: "Capability" },
+  { href: "#education", label: "Education" },
   { href: "#approach", label: "Approach" },
 ];
 

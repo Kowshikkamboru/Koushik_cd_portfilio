@@ -69,16 +69,13 @@ function getSkillGroupIcon(title: string) {
       );
     case "ship":
       return (
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09zM12 15l-3-3m0 0l5.5-5.5a4.24 4.24 0 016 6L15 18l-6-6z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <Image
+          src="/rocket.png"
+          alt=""
+          width={20}
+          height={20}
+          className="skill-icon-img"
+        />
       );
     case "foundation":
     default:
@@ -103,6 +100,22 @@ function getSkillGroupIcon(title: string) {
           />
         </svg>
       );
+  }
+}
+
+function getSkillGroupSummary(title: string) {
+  switch (title.toLowerCase()) {
+    case "build":
+      return "Mobile apps & responsive web interfaces";
+    case "systems":
+      return "APIs, databases, auth, maps & payments";
+    case "ai and data":
+      return "Computer vision, ML models & RAG flows";
+    case "ship":
+      return "Store releases, deploys & automation";
+    case "foundation":
+    default:
+      return "Core CS, networking, Linux & docs";
   }
 }
 
@@ -301,8 +314,57 @@ export default function About() {
           ))}
         </div>
 
+        <div className="education-wrap" id="education">
+          <div className="section-heading-center education-heading" data-reveal>
+            <span className="eyebrow-orange">Education</span>
+            <h2 className="section-title-lg">
+              Academic foundation in{" "}
+              <span className="text-orange">CS and AIML.</span>
+            </h2>
+            <p className="section-subtitle">
+              Formal engineering education combining computer science
+              fundamentals, applied AI/ML research, and technical leadership.
+            </p>
+          </div>
+
+          <div className="education-grid">
+            {education.map((item) => (
+              <article className="education-card" key={item.degree} data-reveal>
+                <div className="edu-top">
+                  <span className="edu-period">{item.period}</span>
+                  <span className="edu-grade">{item.result}</span>
+                </div>
+                <h3>{item.degree}</h3>
+                <p className="edu-school">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span>{item.school}</span>
+                </p>
+                <ul className="edu-notes-list">
+                  {item.notes.map((note) => (
+                    <li key={note}>
+                      <CheckIcon />
+                      <span>{note}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="capability-container">
         <div className="capability-wrap" id="capability">
-          <div className="section-heading-center" data-reveal>
+          <div className="section-heading-center capability-heading" data-reveal>
             <span className="eyebrow-orange">Capability map</span>
             <h2 className="section-title-lg">
               Skills organized by how{" "}
@@ -315,17 +377,29 @@ export default function About() {
           </div>
 
           <div className="skill-grid">
-            {skillGroups.map((group) => (
+            {skillGroups.map((group, idx) => (
               <article className="skill-card" key={group.title} data-reveal>
                 <div className="skill-card-top">
-                  <div className="skill-icon-badge">
-                    {getSkillGroupIcon(group.title)}
+                  <div className="skill-card-id">
+                    <div className="skill-icon-badge">
+                      {getSkillGroupIcon(group.title)}
+                    </div>
+                    <span className="skill-stage-tag">
+                      Stage {String(idx + 1).padStart(2, "0")}
+                    </span>
                   </div>
                   <span className="skill-count-badge">
                     {group.skills.length} skills
                   </span>
                 </div>
-                <h3>{group.title}</h3>
+
+                <div className="skill-card-head">
+                  <h3>{group.title}</h3>
+                  <p className="skill-card-summary">
+                    {getSkillGroupSummary(group.title)}
+                  </p>
+                </div>
+
                 <div className="skill-chips-wrap">
                   {group.skills.map((skill) => (
                     <span className="skill-chip" key={skill}>
@@ -337,39 +411,6 @@ export default function About() {
               </article>
             ))}
           </div>
-        </div>
-
-        <div className="education-grid">
-          {education.map((item) => (
-            <article className="education-card" key={item.degree} data-reveal>
-              <div className="edu-top">
-                <span className="edu-period">{item.period}</span>
-                <span className="edu-grade">{item.result}</span>
-              </div>
-              <h3>{item.degree}</h3>
-              <p className="edu-school">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <span>{item.school}</span>
-              </p>
-              <ul className="edu-notes-list">
-                {item.notes.map((note) => (
-                  <li key={note}>
-                    <CheckIcon />
-                    <span>{note}</span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
         </div>
       </div>
     </section>
