@@ -119,11 +119,20 @@ export default function Publications() {
                   <div className="community-role-list">
                     {group.items.map((item) => (
                       <article
-                        className="community-role-item"
+                        className={`community-role-item ${
+                          item.featured ? "is-featured" : ""
+                        }`}
                         key={`${item.role}-${item.org}`}
                       >
                         <div className="community-role-top">
-                          <h4>{item.role}</h4>
+                          <div className="community-role-title-wrap">
+                            <h4>{item.role}</h4>
+                            {item.featured && (
+                              <span className="community-featured-tag">
+                                Featured
+                              </span>
+                            )}
+                          </div>
                           <span className="community-period-pill">
                             {item.period}
                           </span>

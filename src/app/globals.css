@@ -3224,6 +3224,7 @@ svg {
 }
 
 .community-role-item {
+  position: relative;
   padding: 1.15rem 1.25rem;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.045);
@@ -3231,6 +3232,7 @@ svg {
   display: flex;
   flex-direction: column;
   gap: 0.38rem;
+  overflow: hidden;
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
@@ -3238,6 +3240,39 @@ svg {
   transform: translateY(-2px);
   border-color: rgba(253, 133, 58, 0.48);
   background: rgba(255, 255, 255, 0.075);
+}
+
+.community-role-item.is-featured {
+  background: linear-gradient(
+    145deg,
+    rgba(253, 133, 58, 0.16) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  border-color: rgba(253, 133, 58, 0.48);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
+}
+
+.community-role-item.is-featured::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(253, 133, 58, 0.85) 0%,
+    rgba(253, 133, 58, 0.16) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.community-role-item.is-featured:hover {
+  border-color: var(--orange-400);
+  background: linear-gradient(
+    145deg,
+    rgba(253, 133, 58, 0.22) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
 }
 
 .community-role-top {
@@ -3248,12 +3283,32 @@ svg {
   flex-wrap: wrap;
 }
 
+.community-role-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
 .community-role-top h4 {
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 1.08rem;
   line-height: 1.28;
   color: #ffffff;
+}
+
+.community-featured-tag {
+  padding: 0.16rem 0.58rem;
+  border-radius: 60px;
+  background: rgba(253, 133, 58, 0.24);
+  border: 1px solid rgba(253, 133, 58, 0.5);
+  color: var(--orange-300);
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .community-period-pill {
@@ -3273,6 +3328,10 @@ svg {
   font-size: 0.84rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.66);
+}
+
+.community-role-item.is-featured .community-role-org {
+  color: var(--orange-300);
 }
 
 .community-role-detail {

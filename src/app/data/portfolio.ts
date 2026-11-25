@@ -385,7 +385,23 @@ export const researchPublications = [
   },
 ];
 
-export const leadershipRoles = [
+export type CommunityRoleItem = {
+  role: string;
+  org: string;
+  period: string;
+  detail: string;
+  featured?: boolean;
+};
+
+export const leadershipRoles: CommunityRoleItem[] = [
+  {
+    role: "Joint Secretary",
+    org: "SVEC — Sree Vidyanikethan Engineering College, Tirupati",
+    period: "Apr 2023 – May 2025",
+    detail:
+      "Served for 2 yrs 2 mos leading technical and student association initiatives beyond code.",
+    featured: true,
+  },
   {
     role: "Campus Ambassador",
     org: "E-Cell, IIT Bombay · Remote",
@@ -393,16 +409,9 @@ export const leadershipRoles = [
     detail:
       "Represented a national entrepreneurship community and promoted startup programs to students. Built communication, outreach, and stakeholder coordination habits beyond engineering tasks, and developed a stronger product/business lens.",
   },
-  {
-    role: "Joint Secretary",
-    org: "SVEC — Sree Vidyanikethan Engineering College, Tirupati",
-    period: "Apr 2023 – May 2025",
-    detail:
-      "Served for 2 yrs 2 mos leading technical and student association initiatives beyond code.",
-  },
 ];
 
-export const volunteeringServices = [
+export const volunteeringServices: CommunityRoleItem[] = [
   {
     role: "Squad Leader",
     org: "National Service Scheme (NSS)",
