@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { profile } from "../data/portfolio";
 import { ArrowUpRightIcon, MailIcon, SendIcon } from "./Icons";
@@ -36,7 +37,15 @@ export default function Footer() {
         <div className="footer-main-grid">
           <div className="footer-brand-col">
             <div className="nav-brand-center" style={{ paddingLeft: 0 }}>
-              <span className="brand-circle-badge">{profile.initials}</span>
+              <span className="brand-circle-badge">
+                <Image
+                  src="/assets/ak-logo.png"
+                  alt=""
+                  width={44}
+                  height={44}
+                  className="brand-circle-img"
+                />
+              </span>
               <span className="brand-wordmark">Koushik</span>
             </div>
             <p>

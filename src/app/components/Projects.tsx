@@ -28,8 +28,6 @@ function getProjectThemeClass(id: string) {
       return "pv-theme-teal";
     case "dump-them-all":
       return "pv-theme-steel";
-    case "kings-portal":
-      return "pv-theme-charcoal";
     case "apnagaadi":
     default:
       return "pv-theme-sky";
@@ -256,37 +254,6 @@ function renderProjectVisual(project: ProjectItem) {
           <div className="pv-hud-metrics">
             <span>Relational Model</span>
             <span>Pickup Slots</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (project.id === "kings-portal") {
-    return (
-      <div className="pv-scene pv-brand-laptop">
-        <div className="pv-brand-head">
-          <span className="pv-brand-word is-sm">King&apos;s Portal</span>
-          <span className="pv-brand-chip">Auth.js · Vercel</span>
-        </div>
-        <div className="pv-laptop-frame">
-          <div className="pv-laptop-bar">
-            <span />
-            <span />
-            <span />
-            <small>Community Platform</small>
-          </div>
-          <div className="pv-laptop-body">
-            <div className="pv-kpi-row">
-              <div>
-                <strong>Members</strong>
-                <span>Role Dashboards</span>
-              </div>
-              <div>
-                <strong>Spaces</strong>
-                <span>Moderation UI</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>

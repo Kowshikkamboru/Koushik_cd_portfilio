@@ -110,3 +110,87 @@ export function SendIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
+export function DocumentTextIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M14 2H7a2 2 0 00-2 2v16a2 2 0 002 2h10a2 2 0 002-2V7l-5-5z"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14 2v5h5M9 13h6M9 17h4"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function ShieldCheckIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M12 2.5l7.5 3v6.2c0 4.6-3.2 8.7-7.5 9.8-4.3-1.1-7.5-5.2-7.5-9.8V5.5l7.5-3z"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.2 12.2l2 2 3.8-4"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function UsersGroupIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle
+        cx="9"
+        cy="7"
+        r="3.5"
+        stroke="currentColor"
+        strokeWidth="1.9"
+      />
+      <path
+        d="M22 21v-2a4 4 0 00-3-3.87M16.5 3.63a3.5 3.5 0 010 6.75"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function SparkHandsIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M12 21s-7-4.35-9.1-8.5C1.2 9.15 3.1 5 6.8 5c2.1 0 3.7 1.15 5.2 2.85C13.5 6.15 15.1 5 17.2 5c3.7 0 5.6 4.15 3.9 7.5C19 16.65 12 21 12 21z"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}

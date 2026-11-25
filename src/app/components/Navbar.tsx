@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { profile } from "../data/portfolio";
 
@@ -127,7 +128,16 @@ export default function Navbar() {
           onClick={() => goTo("#home")}
           aria-label="Go to home"
         >
-          <span className="brand-circle-badge">{profile.initials}</span>
+          <span className="brand-circle-badge">
+            <Image
+              src="/assets/ak-logo.png"
+              alt=""
+              width={44}
+              height={44}
+              preload
+              className="brand-circle-img"
+            />
+          </span>
           <span className="brand-wordmark">Koushik Amboru</span>
         </button>
 

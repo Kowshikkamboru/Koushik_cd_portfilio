@@ -12,8 +12,7 @@ export default function Experience() {
           </h2>
           <p className="section-subtitle">
             Roles where I converted learning into delivery: production mobile
-            releases, automation, frontend delivery, AI/ML foundations, and
-            leadership exposure.
+            releases, automation, frontend delivery, and AI/ML foundations.
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 export const profile = {
   name: "Amboru Koushik",
   initials: "AK",
-  email: "kowshikkamboru@gmail.com",
+  email: "amborukoushik@gmail.com",
   phone: "+91 7780239794",
   location: "Hyderabad, India",
   linkedin: "https://www.linkedin.com/in/koushik-amboru/",
@@ -232,22 +232,6 @@ export const projects = [
     evidence: ["Relational model", "Geospatial matching", "Scheduling workflow"],
   },
   {
-    id: "kings-portal",
-    category: "Frontend",
-    title: "King's Portal",
-    subtitle: "Community IT platform with authentication and dashboards",
-    status: "Live",
-    stack: ["Next.js", "Auth.js", "PostgreSQL", "Tailwind CSS", "Vercel"],
-    problem:
-      "A community platform needed member identity, content areas, discussion spaces, role-based dashboards, and moderation.",
-    architecture:
-      "Built a full-stack web app with authenticated user flows, structured content modules, dashboard areas, and security-reviewed component planning.",
-    impact:
-      "Shows frontend product thinking beyond static pages: identity, workflow, moderation, and deployment.",
-    evidence: ["Role-based UI", "Auth flow", "Production deployment"],
-    links: [{ label: "Live site", href: "https://king-s-portal-web.web.app" }],
-  },
-  {
     id: "apnagaadi",
     category: "Frontend",
     title: "ApnaGaadi",
@@ -334,19 +318,6 @@ export const experiences = [
       "Built bots for scraping, document processing, spreadsheet workflows, and reporting automation.",
     ],
   },
-  {
-    role: "Campus Ambassador",
-    company: "E-Cell, IIT Bombay",
-    period: "Jul 2024 - Jun 2025",
-    location: "Remote",
-    type: "Leadership",
-    summary:
-      "Represented a national entrepreneurship community and promoted startup programs to students.",
-    impact: [
-      "Built communication, outreach, and stakeholder coordination habits beyond engineering tasks.",
-      "Promoted entrepreneurship events and developed a stronger product/business lens.",
-    ],
-  },
 ];
 
 export const skillGroups = [
@@ -389,9 +360,12 @@ export const education = [
   },
 ];
 
-export const researchAndRecognition = [
+export const researchPublications = [
   {
-    label: "IEEE ICICCS 2025",
+    badge: "Peer-Reviewed Paper",
+    venue: "IEEE ICICCS 2025",
+    tag: "First Author",
+    kind: "paper" as const,
     title: "Detecting Vehicle Number Plates Involved in Road Accidents Using CNN and PSO",
     detail:
       "First-author research covering dataset preparation, preprocessing, PSO optimization, CNN training, and evaluation for ALPR under difficult road conditions.",
@@ -399,18 +373,80 @@ export const researchAndRecognition = [
     link: "https://doi.org/10.1109/ICICCS65191.2025.10984880",
   },
   {
-    label: "Indian Patent Application",
+    badge: "Filed Patent IP",
+    venue: "Indian Patent Office",
+    tag: "AI + IoT",
+    kind: "patent" as const,
     title: "AI/IoT-Based Vehicle Accident Detection and Reporting System",
     detail:
       "Hybrid accident detection concept combining computer vision and IoT signals for real-time emergency reporting.",
     meta: "Application No. 202541110844",
+    statusLabel: "Filed & Published",
+  },
+];
+
+export const leadershipRoles = [
+  {
+    role: "Campus Ambassador",
+    org: "E-Cell, IIT Bombay · Remote",
+    period: "Jul 2024 – Jun 2025",
+    detail:
+      "Represented a national entrepreneurship community and promoted startup programs to students. Built communication, outreach, and stakeholder coordination habits beyond engineering tasks, and developed a stronger product/business lens.",
   },
   {
-    label: "Leadership",
-    title: "Joint Secretary, NSS Squad Leader, Campus Ambassador",
+    role: "Joint Secretary",
+    org: "SVEC — Sree Vidyanikethan Engineering College, Tirupati",
+    period: "Apr 2023 – May 2025",
     detail:
-      "Organized technical and community initiatives, represented entrepreneurship programs, and strengthened communication beyond code.",
-    meta: "SVCE, NSS, E-Cell IIT Bombay",
+      "Served for 2 yrs 2 mos leading technical and student association initiatives beyond code.",
+  },
+];
+
+export const volunteeringServices = [
+  {
+    role: "Squad Leader",
+    org: "National Service Scheme (NSS)",
+    period: "Social Services",
+    detail:
+      "Served as Squad Leader with the National Service Scheme under Social Services community initiatives.",
+  },
+  {
+    role: "Student Coordinator",
+    org: "Google Developer Student Clubs (GDSC)",
+    period: "Aug 2023 – May 2024",
+    detail:
+      "Served for 10 mos with Google Developer Student Clubs (GDSC) under Education initiatives.",
+  },
+];
+
+export const featuredCertifications: Array<{
+  title: string;
+  issuer: string;
+  period: string;
+  credentialId: string;
+  domain: string;
+  badge: string;
+  verifyUrl?: string;
+}> = [
+  {
+    title: "Redis Associate Developer",
+    issuer: "Redis",
+    period: "Issued Oct 2026 · Expires Oct 2028",
+    credentialId: "196180570",
+    domain: "credentials.redis.io",
+    badge: "/assets/cert-redis.png",
+    verifyUrl:
+      "https://credentials.redis.io/7bc72f9f-de06-4f33-8d8b-e999dfecd89d#acc.GPALmv4l",
+  },
+  {
+    title: "Postman API Fundamentals Student Expert",
+    issuer: "Canvas Credentials (Badgr)",
+    period: "Issued Aug 2024",
+    credentialId: "66ae7aea9407db50ce739e8d",
+    domain: "badgr.com",
+    badge: "/assets/cert-postman.png",
+    verifyUrl:
+      "https://badges.parchment.com/public/assertions/tgudliMURfiM75eEFfmvFA",
   },
 ];
 
