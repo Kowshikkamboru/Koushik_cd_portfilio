@@ -1,14 +1,47 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { projects } from "../data/portfolio";
 import {
   ArrowUpRightIcon,
   CheckCircleIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CloseIcon,
   ExternalLinkIcon,
 } from "./Icons";
 
 type ProjectItem = (typeof projects)[number];
+
+function getCaseStudyPillars(project: ProjectItem) {
+  return [
+    { step: "01", label: "The Problem", body: project.problem },
+    { step: "02", label: "System Architecture", body: project.architecture },
+    { step: "03", label: "Measurable Impact", body: project.impact },
+  ];
+}
+
+function ProjectLinks({ links }: { links?: ProjectItem["links"] }) {
+  if (!links?.length) return null;
+
+  return (
+    <div className="project-links-row">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noreferrer"
+          key={link.href}
+          className="project-link-pill"
+        >
+          <span>{link.label}</span>
+          <ExternalLinkIcon />
+        </a>
+      ))}
+    </div>
+  );
+}
 
 function getProjectThemeClass(id: string) {
   switch (id) {
@@ -290,11 +323,218 @@ function renderProjectVisual(project: ProjectItem) {
   );
 }
 
+type CaseStudyModalProps = {
+  project: ProjectItem;
+  index: number;
+  total: number;
+  activeFilterLabel: string;
+  prevProject: ProjectItem | null;
+  nextProject: ProjectItem | null;
+  onClose: () => void;
+  onSelectProject: (id: string) => void;
+};
+
+function CaseStudyModal({
+  project,
+  index,
+  total,
+  activeFilterLabel,
+  prevProject,
+  nextProject,
+  onClose,
+  onSelectProject,
+}: CaseStudyModalProps) {
+  const titleId = useId();
+  const descId = useId();
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    document.body.classList.add("modal-open");
+    closeBtnRef.current?.focus();
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
+  }, []);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [project.id]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      } else if (event.key === "ArrowLeft" && prevProject) {
+        event.preventDefault();
+        onSelectProject(prevProject.id);
+      } else if (event.key === "ArrowRight" && nextProject) {
+        event.preventDefault();
+        onSelectProject(nextProject.id);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, onSelectProject, prevProject, nextProject]);
+
+  if (typeof document === "undefined") return null;
+
+  const pillars = getCaseStudyPillars(project);
+
+  return createPortal(
+    <div
+      className="project-modal-backdrop"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div
+        className="project-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descId}
+      >
+        <div className="project-modal-topbar">
+          <div className="project-modal-meta">
+            <span className="project-modal-counter">
+              {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+              {activeFilterLabel !== "All" ? ` · ${activeFilterLabel}` : ""}
+            </span>
+            <span className="project-card-tag">{project.category}</span>
+            <span className="project-meta-dot-item">
+              <span className="orange-dot-9" />
+              <span>{project.status}</span>
+            </span>
+          </div>
+
+          <div className="project-modal-actions">
+            {prevProject && nextProject && (
+              <div className="project-modal-nav-group" role="group" aria-label="Switch case study">
+                <button
+                  type="button"
+                  className="project-modal-icon-btn"
+                  aria-label={`Previous project: ${prevProject.title}`}
+                  onClick={() => onSelectProject(prevProject.id)}
+                >
+                  <ChevronLeftIcon />
+                </button>
+                <button
+                  type="button"
+                  className="project-modal-icon-btn"
+                  aria-label={`Next project: ${nextProject.title}`}
+                  onClick={() => onSelectProject(nextProject.id)}
+                >
+                  <ChevronRightIcon />
+                </button>
+              </div>
+            )}
+            <button
+              ref={closeBtnRef}
+              type="button"
+              className="project-modal-close-btn"
+              aria-label="Close case study"
+              onClick={onClose}
+            >
+              <CloseIcon />
+            </button>
+          </div>
+        </div>
+
+        <div className="project-modal-scroll" ref={scrollRef}>
+          <div className="project-modal-hero">
+            <div className={`project-modal-visual ${getProjectThemeClass(project.id)}`}>
+              {renderProjectVisual(project)}
+            </div>
+
+            <div className="project-modal-intro">
+              <h2 id={titleId}>{project.title}</h2>
+              <p className="project-modal-subtitle" id={descId}>
+                {project.subtitle}
+              </p>
+
+              <div className="project-modal-stack-group">
+                <span className="project-modal-label">Stack &amp; Systems</span>
+                <div className="project-tech-row">
+                  {project.stack.map((tech) => (
+                    <span key={tech} className="project-tech-chip">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <ProjectLinks links={project.links} />
+            </div>
+          </div>
+
+          <div className="project-modal-breakdown">
+            {pillars.map((pillar) => (
+              <section className="project-modal-pillar" key={pillar.label}>
+                <div className="project-modal-pillar-head">
+                  <span className="project-modal-step">{pillar.step}</span>
+                  <h3>{pillar.label}</h3>
+                </div>
+                <p>{pillar.body}</p>
+              </section>
+            ))}
+          </div>
+
+          <div className="project-modal-deliverables">
+            <span className="project-modal-label">Verified Deliverables</span>
+            <div className="project-modal-evidence-grid">
+              {project.evidence.map((item) => (
+                <div className="project-modal-evidence-item" key={item}>
+                  <CheckCircleIcon />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {prevProject && nextProject && (
+          <div className="project-modal-footer">
+            <button
+              type="button"
+              className="project-modal-switch-btn"
+              onClick={() => onSelectProject(prevProject.id)}
+            >
+              <ChevronLeftIcon />
+              <span>
+                <small>Previous</small>
+                <strong>{prevProject.title}</strong>
+              </span>
+            </button>
+            <button
+              type="button"
+              className="project-modal-switch-btn is-next"
+              onClick={() => onSelectProject(nextProject.id)}
+            >
+              <span>
+                <small>Next</small>
+                <strong>{nextProject.title}</strong>
+              </span>
+              <ChevronRightIcon />
+            </button>
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 export default function Projects() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [spotlightId, setSpotlightId] = useState(projects[0].id);
-  const [openProject, setOpenProject] = useState("");
+  const [activeModalId, setActiveModalId] = useState<string | null>(null);
   const [featuredPage, setFeaturedPage] = useState(0);
+  const lastFocusedRef = useRef<HTMLElement | null>(null);
 
   const categories = useMemo(
     () => [
@@ -323,11 +563,47 @@ export default function Projects() {
   const currentPair = featuredPairs[featuredPage] ?? featuredPairs[0];
   const spotlightProject =
     projects.find((p) => p.id === spotlightId) ?? projects[0];
+  const spotlightPillars = getCaseStudyPillars(spotlightProject);
 
-  const handleSelectProject = (id: string) => {
-    setSpotlightId(id);
-    setOpenProject((prev) => (prev === id ? "" : id));
-  };
+  const modalList = useMemo(() => {
+    if (activeModalId && visibleProjects.some((p) => p.id === activeModalId)) {
+      return visibleProjects;
+    }
+    return projects;
+  }, [activeModalId, visibleProjects]);
+
+  const modalIndex = useMemo(
+    () =>
+      activeModalId
+        ? modalList.findIndex((project) => project.id === activeModalId)
+        : -1,
+    [activeModalId, modalList]
+  );
+
+  const modalProject = modalIndex >= 0 ? modalList[modalIndex] : null;
+  const prevModalProject =
+    modalIndex >= 0 && modalList.length > 1
+      ? modalList[(modalIndex - 1 + modalList.length) % modalList.length]
+      : null;
+  const nextModalProject =
+    modalIndex >= 0 && modalList.length > 1
+      ? modalList[(modalIndex + 1) % modalList.length]
+      : null;
+
+  const openCaseStudy = useCallback((id: string) => {
+    lastFocusedRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    setActiveModalId(id);
+  }, []);
+
+  const closeCaseStudy = useCallback(() => {
+    setActiveModalId(null);
+    requestAnimationFrame(() => {
+      lastFocusedRef.current?.focus();
+    });
+  }, []);
 
   return (
     <section className="section-light" id="projects">
@@ -422,13 +698,15 @@ export default function Projects() {
                 <ArrowUpRightIcon />
               </a>
             ) : (
-              <a
-                href="#projects-grid"
+              <button
+                type="button"
                 className="spotlight-orange-btn"
-                aria-label={`Inspect ${spotlightProject.title}`}
+                aria-haspopup="dialog"
+                aria-label={`Open ${spotlightProject.title} case study`}
+                onClick={() => openCaseStudy(spotlightProject.id)}
               >
                 <ArrowUpRightIcon />
-              </a>
+              </button>
             )}
           </div>
 
@@ -443,18 +721,12 @@ export default function Projects() {
           </div>
 
           <div className="spotlight-triad">
-            <div className="spotlight-triad-item">
-              <span>The Problem</span>
-              <p>{spotlightProject.problem}</p>
-            </div>
-            <div className="spotlight-triad-item">
-              <span>System Architecture</span>
-              <p>{spotlightProject.architecture}</p>
-            </div>
-            <div className="spotlight-triad-item">
-              <span>Measurable Impact</span>
-              <p>{spotlightProject.impact}</p>
-            </div>
+            {spotlightPillars.map((pillar) => (
+              <div className="spotlight-triad-item" key={pillar.label}>
+                <span>{pillar.label}</span>
+                <p>{pillar.body}</p>
+              </div>
+            ))}
           </div>
 
           <div className="spotlight-footer-bar">
@@ -466,22 +738,7 @@ export default function Projects() {
                 </span>
               ))}
             </div>
-            {spotlightProject.links && (
-              <div className="project-links-row">
-                {spotlightProject.links.map((link) => (
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    key={link.href}
-                    className="project-link-pill"
-                  >
-                    <span>{link.label}</span>
-                    <ExternalLinkIcon />
-                  </a>
-                ))}
-              </div>
-            )}
+            <ProjectLinks links={spotlightProject.links} />
           </div>
         </div>
 
@@ -509,118 +766,110 @@ export default function Projects() {
 
         {/* 3-Column Showcase Cards (Figma Frame 325) */}
         <div className="project-cards-grid">
-          {visibleProjects.map((project) => {
-            const isOpen = openProject === project.id;
-            return (
-              <article className="project-showcase-card" key={project.id}>
+          {visibleProjects.map((project) => (
+            <article className="project-showcase-card" key={project.id}>
+              <div
+                className="project-visual-wrap"
+                onClick={() => openCaseStudy(project.id)}
+              >
                 <div
-                  className="project-visual-wrap"
-                  onClick={() => handleSelectProject(project.id)}
+                  className={`project-visual-box ${getProjectThemeClass(
+                    project.id
+                  )}`}
                 >
-                  <div
-                    className={`project-visual-box ${getProjectThemeClass(
-                      project.id
-                    )}`}
-                  >
-                    {renderProjectVisual(project)}
-                  </div>
+                  {renderProjectVisual(project)}
+                </div>
 
+                <button
+                  type="button"
+                  className="project-corner-btn"
+                  aria-haspopup="dialog"
+                  aria-label={`Open ${project.title} case study`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    openCaseStudy(project.id);
+                  }}
+                >
+                  <ArrowUpRightIcon />
+                </button>
+              </div>
+
+              <span className="project-card-tag">{project.category}</span>
+
+              <div className="project-meta-dots">
+                <span className="project-meta-dot-item">
+                  <span className="orange-dot-9" />
+                  <span>{project.status}</span>
+                </span>
+                <span className="project-meta-dot-item">
+                  <span className="orange-dot-9" />
+                  <span>{project.stack.length} technologies</span>
+                </span>
+              </div>
+
+              <div>
+                <h3 className="project-card-title">
                   <button
                     type="button"
-                    className={`project-corner-btn ${isOpen ? "is-open" : ""}`}
-                    aria-expanded={isOpen}
-                    aria-label={
-                      isOpen
-                        ? `Collapse ${project.title} details`
-                        : `Expand ${project.title} details`
-                    }
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleSelectProject(project.id);
-                    }}
+                    className="project-card-title-btn"
+                    aria-haspopup="dialog"
+                    onClick={() => openCaseStudy(project.id)}
                   >
-                    <ArrowUpRightIcon />
+                    {project.title}
                   </button>
-                </div>
+                </h3>
+                <p className="project-card-subtitle">{project.subtitle}</p>
+              </div>
 
-                <span className="project-card-tag">{project.category}</span>
-
-                <div className="project-meta-dots">
-                  <span className="project-meta-dot-item">
-                    <span className="orange-dot-9" />
-                    <span>{project.status}</span>
+              <div className="project-tech-row">
+                {project.stack.map((tech) => (
+                  <span key={tech} className="project-tech-chip">
+                    {tech}
                   </span>
-                  <span className="project-meta-dot-item">
-                    <span className="orange-dot-9" />
-                    <span>{project.stack.length} technologies</span>
-                  </span>
-                </div>
+                ))}
+              </div>
 
-                <div>
-                  <h3 className="project-card-title">{project.title}</h3>
-                  <p className="project-card-subtitle">{project.subtitle}</p>
-                </div>
-
-                <div className="project-tech-row">
-                  {project.stack.map((tech) => (
-                    <span key={tech} className="project-tech-chip">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-
-                {isOpen && (
-                  <div className="project-detail-drawer">
-                    <div className="project-detail-block">
-                      <strong>The Problem</strong>
-                      <p>{project.problem}</p>
-                    </div>
-
-                    <div className="project-detail-block">
-                      <strong>System Architecture</strong>
-                      <p>{project.architecture}</p>
-                    </div>
-
-                    <div className="project-detail-block">
-                      <strong>Measurable Impact</strong>
-                      <p>{project.impact}</p>
-                    </div>
-
-                    <div className="project-detail-block">
-                      <strong>Verified Deliverables</strong>
-                      <ul className="project-evidence-list">
-                        {project.evidence.map((item) => (
-                          <li key={item}>
-                            <CheckCircleIcon />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {project.links && (
-                      <div className="project-links-row">
-                        {project.links.map((link) => (
-                          <a
-                            href={link.href}
-                            target="_blank"
-                            rel="noreferrer"
-                            key={link.href}
-                            className="project-link-pill"
-                          >
-                            <span>{link.label}</span>
-                            <ExternalLinkIcon />
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+              <div className="project-card-footer">
+                <button
+                  type="button"
+                  className="project-card-case-btn"
+                  aria-haspopup="dialog"
+                  onClick={() => openCaseStudy(project.id)}
+                >
+                  <span>Read case study</span>
+                  <ArrowUpRightIcon />
+                </button>
+                {project.links?.[0] && (
+                  <a
+                    href={project.links[0].href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="project-card-ext-link"
+                  >
+                    <span>{project.links[0].label}</span>
+                    <ExternalLinkIcon />
+                  </a>
                 )}
-              </article>
-            );
-          })}
+              </div>
+            </article>
+          ))}
         </div>
       </div>
+
+      {modalProject && (
+        <CaseStudyModal
+          project={modalProject}
+          index={modalIndex}
+          total={modalList.length}
+          activeFilterLabel={
+            modalList === visibleProjects ? activeCategory : "All"
+          }
+          prevProject={prevModalProject}
+          nextProject={nextModalProject}
+          onClose={closeCaseStudy}
+          onSelectProject={setActiveModalId}
+        />
+      )}
     </section>
   );
 }
